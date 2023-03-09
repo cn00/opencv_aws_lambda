@@ -1,0 +1,19 @@
+version: "3"
+
+#name: snn
+
+networks:
+  net:
+    driver: bridge
+
+services:
+
+  # 批量识别条码
+  barcode:
+    image: sn/udi-barcode-opencv:lambda
+    build:
+      dockerfile: ./Dockerfile
+    tty: true
+    stdin_open: true
+    volumes:
+      - ./out:/output
