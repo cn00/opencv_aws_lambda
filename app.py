@@ -2,18 +2,19 @@ import json
 
 from sys import argv
 from math import *
-import cv2
+import cv2, os
 import numpy as np
 from urllib import request as urlRequest
-import pyzbar.pyzbar as pyzbar
+# import pyzbar.pyzbar as pyzbar
 
 import boto3
 s3 = boto3.client('s3')
 # bucket=os.getenv("AWS_S3_BUCKET")
-bucket='snn-udi-s3' #os.getenv("AWS_S3_BUCKET")
+bucket='snn-a360-storage' #os.getenv("AWS_S3_BUCKET")
 
 # 解析图片中的条形码和二维码
 def detectBarcode(image):
+    import pyzbar.pyzbar as pyzbar
     # 识别图中的码，加入到集合中
     result = []
     image = cv2.imdecode(image, cv2.IMREAD_COLOR)
@@ -30,6 +31,7 @@ def detectBarcode(image):
         result.append(tt)
     # 旋转90度
     image = rotate_bound_white_bg(image, 45)
+    
     texts = pyzbar.decode(image)
     for text in texts:
         tt = text.data.decode("utf-8")
@@ -72,11 +74,17 @@ def rotate_bound_white_bg(image, angle):
 
 
 def lambda_handler(event, context):
-    request_data = event['queryStringParameters']
-    imgurl = request_data['imgURL']
+    os.environ['PATH'] = os.environ['PATH'] + ":/opt/lib/x86_64-linux-gnu/"
+    os.environ['LD_LIBRARY_PATH'] = os.environ['LD_LIBRARY_PATH'] + ":/opt/lib/x86_64-linux-gnu/"
+    print("PATH:>",os.environ)
+
+    print("event", event)
+    print("context", context)
+    #request_data = event['queryStringParameters']
+    #imgurl = request_data['imgURL']
     response = s3.get_object(
         Bucket=bucket,
-        Key=imgurl,
+        Key="image/2023-03-08/tmp_9a049da155b010e00bd959f8514d02aeeeded6a1ea09d96f.jpg",
     )
     image = np.asarray(bytearray(response['Body'].read()), dtype="uint8")
     result = detectBarcode(image)
