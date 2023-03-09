@@ -2,4 +2,4 @@
 opencv-python
 pyzbar
 numpy
-#boto3
+#boto3 # lambda env already include
