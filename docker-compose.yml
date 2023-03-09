@@ -8,12 +8,29 @@ networks:
 
 services:
 
-  # 批量识别条码
-  barcode:
+  cvu:
+    image: sn/udi-barcode-opencv-u:lambda
+    build:
+      dockerfile: ./ubuntu.Dockerfile
+    # tty: true
+    # stdin_open: true
+    command: cp /packages/cv2-python37.zip /output/
+    volumes:
+      - ./out:/output
+  cv:
     image: sn/udi-barcode-opencv:lambda
     build:
       dockerfile: ./Dockerfile
-    tty: true
-    stdin_open: true
+    # tty: true
+    # stdin_open: true
+    command: cp /packages/cv2-python37.zip /output/
     volumes:
       - ./out:/output
+
+  boto3:
+    image: sn/udi-barcode-boto3:lambda
+    build:
+      dockerfile: ./boto3.Dockerfile
+    command: cp /packages/boto3-python37.zip /output/
+    volumes:
+      - ./out:/output      
